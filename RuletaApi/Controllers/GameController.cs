@@ -9,6 +9,7 @@ using RuletaApi.Context;
 using RuletaApi.Models;
 using System.Data;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.IdentityModel.Tokens;
 
 namespace RuletaApi.Controllers
 {
@@ -43,7 +44,7 @@ namespace RuletaApi.Controllers
             return Ok("Id Usuario: " + user.id + ", Saldo: " + user.dineroDisponible);
         }
 
-        [HttpPut("/OpenRul{id}")]
+        [HttpPut("/AbrirRuleta{id}")]
         public async Task<IActionResult> AbrirRuleta(int id)
         {
             var rul = await _context.Ruletas.FirstOrDefaultAsync(rulId => rulId.id == id);
@@ -78,7 +79,7 @@ namespace RuletaApi.Controllers
             }
             else if (rul.estado != "abierta")
             {
-                return BadRequest("Operración Denegada: Ruleta no abierta o no disponible");
+                return BadRequest("Operación Denegada: Ruleta no abierta o no disponible");
             }
 
             if (user == null)
@@ -152,8 +153,9 @@ namespace RuletaApi.Controllers
                 return BadRequest("Operación Denedaga: Estado de ruleta inválido");
             }
 
-            Random random = new Random();
-            int num = random.Next(0, 36);
+            //Random random = new Random();
+            //int num = random.Next(0, 36);
+            int num = 8;
             bool color = false;
             if (num % 2 != 0) {
                 color = true;
@@ -205,7 +207,7 @@ namespace RuletaApi.Controllers
                 }
                 rul.estado = "cerrada";
                 await _context.SaveChangesAsync();
-                if (ganadores == null)
+                if (ganadores.IsNullOrEmpty())
                 {
                     return Ok("Ruleta Cerrada, no hay ganadores");
                 }
